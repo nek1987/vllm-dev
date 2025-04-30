@@ -1,7 +1,6 @@
 services:
   qwen3-8b:
     image: vllm/vllm-openai:v0.8.5      # или :latest
-    runtime: nvidia
     deploy:
       resources:
         reservations:
