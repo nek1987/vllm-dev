@@ -5,9 +5,7 @@ services:
       dockerfile: Dockerfile
       args:
         HF_TOKEN: ${HF_TOKEN}
-
     runtime: nvidia
-
     deploy:
       resources:
         reservations:
