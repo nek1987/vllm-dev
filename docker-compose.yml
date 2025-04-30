@@ -10,7 +10,7 @@ services:
       resources:
         reservations:
           devices:
-              count: 'all'              # или "all"
+            - count: 'all'              # или "all"
               capabilities: ["gpu"]     # ← ОБЯЗАТЕЛЬНО
     command: >
       --model Qwen/Qwen3-8B
