@@ -1,0 +1,34 @@
+version: "3.9"
+services:
+  qwen3-8b:
+    build:
+      context: .              # Dockerfile в корне репо
+      dockerfile: Dockerfile
+      args:
+        HF_TOKEN: ${HF_TOKEN} # передаём secret на время билда
+    image: registry.local/qwen3-8b:v0.8.6-dev   # (Coolify сам маркирует)
+    runtime: nvidia
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: [gpu]
+              device_ids: ["0"]          # ← V100, при желании список
+    command: >
+      --model Qwen/Qwen3-8B
+      --dtype float16
+      --tensor-parallel-size 1
+      --enable-chunked-prefill False     # workaround для V100
+      --max-model-len 32768
+      --port 5080
+    environment:
+      - HF_TOKEN=${HF_TOKEN}
+      - '/etc/localtime:/etc/localtime:ro'            # нужен во время run для refresh
+    shm_size: "16g"
+    volumes:
+      - models:/root/.cache/huggingface  # кэш + скачанная модель
+    ports:
+      - "5080:5080"
+
+volumes:
+  models:

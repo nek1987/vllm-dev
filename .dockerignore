@@ -1,0 +1,53 @@
+# ── Git / CI ─────────────────────────────────────────
+.git
+.github
+.gitattributes
+.gitignore
+
+# ── VCS metadata ─────────────────────────────────────
+*.patch
+*.diff
+
+# ── Docs / markdown / misc ───────────────────────────
+*.md
+LICENSE*
+README*
+
+# ── Editor & IDE files ───────────────────────────────
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+*.code-workspace
+
+# ── Python build artefacts ───────────────────────────
+__pycache__/
+*.py[cod]
+*.egg
+*.egg-info/
+dist/
+build/
+
+# ── Node / frontend artefacts (если вдруг есть) ──────
+node_modules/
+npm-debug.log*
+
+# ── Local model caches ───────────────────────────────
+# (всё равно том монтируется как volume)
+models/
+*.safetensors
+*.bin
+*.pt
+*.onnx
+
+# ── HuggingFace cache (на хосте) ─────────────────────
+*.hfcache
+/root/.cache/huggingface
+
+# ── Docker compose & env ─────────────────────────────
+docker-compose*.yml
+.env
+
+# ── Anything else that should stay outside the image –
+#    добавьте свои директории / файлы
