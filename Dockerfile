@@ -1,31 +1,16 @@
-# ── stage 1 ────────────────────────────────────────────────────────────────
-FROM vllm/vllm-openai:latest AS builder
+# Используем тот же базовый образ, который уже содержит vLLM и нужные зависимости (кроме свежего transformers)
+FROM vllm/vllm-openai:v0.8.5
+# FROM vllm/vllm-openai:latest # Или попробуйте :latest, если v0.8.5 не сработает
 
-# удаляем pre-built vllm и тащим master-ветку
-RUN pip uninstall -y vllm
+# Устанавливаем git (он нужен для pip install git+...)
+# Обновляем pip
+# Удаляем старую версию transformers, чтобы избежать конфликтов (рекомендуется)
+# Устанавливаем САМУЮ ПОСЛЕДНЮЮ версию transformers прямо из GitHub репозитория
+RUN apt-get update && apt-get install -y --no-install-recommends git && rm -rf /var/lib/apt/lists/* && \
+    pip install --no-cache-dir --upgrade pip && \
+    pip uninstall -y transformers && \
+    pip install --no-cache-dir "transformers @ git+https://github.com/huggingface/transformers.git"
 
-ADD https://github.com/vllm-project/vllm/archive/refs/heads/master.tar.gz /tmp/
-
-# распаковываем и сразу «срезаем» первый каталог,
-# всё кладём в /tmp/vllm  → название папки больше не важно
-RUN mkdir /tmp/vllm && \
-    tar -xzf /tmp/master.tar.gz --strip-components=1 -C /tmp/vllm && \
-    pip install --no-cache-dir --upgrade torch==2.2.2 triton==3.0.0 && \
-    pip install --no-cache-dir -e /tmp/vllm
-
-# ── stage 2: минимальный ран-тайм ──────────────────────────────────────────
-FROM nvidia/cuda:12.4.1-runtime-ubuntu22.04
-COPY --from=builder /usr/local /usr/local
-
-# тулзы (опц.)
-RUN pip install --no-cache-dir uvicorn fastapi huggingface_hub[cli]
-
-# заранее качаем модель (нужно пробросить HF_TOKEN при build)
-ARG HF_TOKEN
-RUN huggingface-cli download Qwen/Qwen3-8B \
-        --token $HF_TOKEN \
-        --local-dir /root/.cache/huggingface/hub \
-        --local-dir-use-symlinks False
-
-ENV HF_HUB_DISABLE_TELEMETRY=1
-ENTRYPOINT ["python","-m","vllm.entrypoints.openai.api_server"]
+# Ничего больше делать не нужно. Не переустанавливаем vLLM.
+# Не трогаем версию Torch, позволяем pip разрешить зависимости.
+# Базовый образ уже имеет ENTRYPOINT/CMD для запуска vLLM.
