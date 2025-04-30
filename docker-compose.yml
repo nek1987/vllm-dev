@@ -12,24 +12,23 @@ services:
       resources:
         reservations:
           devices:
-            - driver: nvidia        # ← не обязательно, но читаемо
-              count: 1              # или "all"
-              capabilities: ["gpu"] # ← ОБЯЗАТЕЛЬНО
-              device_ids: ["0"]     # ← можно убрать, если count: 1
+            - driver: nvidia            # ← не обязательно, но читаемо
+              count: 'all'              # или "all"
+              capabilities: ["gpu"]     # ← ОБЯЗАТЕЛЬНО
     command: >
       --model Qwen/Qwen3-8B
       --dtype float16
       --tensor-parallel-size 1
       --enable-chunked-prefill False
       --max-model-len 32768
-      --port 8000
+      --port 5080
     environment:
       - HF_TOKEN=${HF_TOKEN}
     shm_size: "16g"
     volumes:
       - models:/root/.cache/huggingface
     ports:
-      - "8000:8000"
+      - "5080:5080"
 
 volumes:
   models:
