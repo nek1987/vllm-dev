@@ -21,14 +21,14 @@ services:
       --tensor-parallel-size 1
       --enable-chunked-prefill False
       --max-model-len 32768
-      --port 8000
+      --port 5080
     environment:
       - HF_TOKEN=${HF_TOKEN}
     shm_size: "16g"
     volumes:
       - models:/root/.cache/huggingface
     ports:
-      - "8000:8000"
+      - "5080:5080"
 
 volumes:
   models:
