@@ -1,32 +1,23 @@
 services:
   qwen3-8b:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      args:
-        HF_TOKEN: ${HF_TOKEN}
+    image: vllm/vllm-openai:v0.8.5      # или :latest
     runtime: nvidia
     deploy:
       resources:
         reservations:
           devices:
-            - count: all              #  ← дефис ОБЯЗАТЕЛЕН!
-              capabilities: ["gpu"]   #  ← и это в том же блоке
-
+            - count: all
+              capabilities: ["gpu"]
     command: >
       --model Qwen/Qwen3-8B
       --dtype float16
-      --tensor-parallel-size 1
-      --enable-chunked-prefill False
+      --enable-chunked-prefill False     # V100 workaround
       --max-model-len 32768
-      --port 5080
+      --port 8000
     environment:
       - HF_TOKEN=${HF_TOKEN}
     shm_size: "16g"
     volumes:
       - models:/root/.cache/huggingface
-    ports:
-      - "5080:5080"
-
-volumes:
-  models:
+    ports: ["8000:8000"]
+volumes: {models: }
