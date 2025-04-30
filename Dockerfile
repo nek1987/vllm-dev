@@ -1,8 +1,10 @@
 # ── stage 1: берём официальный vLLM, заменяем пакет на fresh-master ──────────
 FROM vllm/vllm-openai:latest AS builder
-RUN pip uninstall -y vllm && \
-    git clone --depth 1 https://github.com/vllm-project/vllm /tmp/vllm && \
-    pip install --no-cache-dir --upgrade torch==2.2.2 triton==3.0.0 && \
+RUN pip uninstall -y vllm
+ADD https://github.com/vllm-project/vllm/archive/refs/heads/master.tar.gz /tmp
+RUN tar -xf /tmp/master.tar.gz -C /tmp && \
+    mv /tmp/vllm-master /tmp/vllm && \
+    pip install --no-cache-dir torch==2.2.2 triton==3.0.0 && \
     pip install --no-cache-dir -e /tmp/vllm
 
 # ── stage 2: финальный ран-тайм (минимум) ────────────────────────────────────
