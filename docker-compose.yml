@@ -7,11 +7,11 @@ services:
       args:
         HF_TOKEN: ${HF_TOKEN} # передаём secret на время билда
     image: registry.local/qwen3-8b:v0.8.6-dev   # (Coolify сам маркирует)
-    runtime: nvidia
     deploy:
       resources:
         reservations:
           devices:
+            - driver: nvidia
             - capabilities: [gpu]
               device_ids: ["0"]          # ← V100, при желании список
     command: >
