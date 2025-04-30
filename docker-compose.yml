@@ -5,13 +5,11 @@ services:
       dockerfile: Dockerfile
       args:
         HF_TOKEN: ${HF_TOKEN}
-    image: qwen3-8b:v0.8.6-dev
     runtime: nvidia                 # важно оставить
     deploy:
       resources:
         reservations:
           devices:
-            - driver: nvidia            # ← не обязательно, но читаемо
               count: 'all'              # или "all"
               capabilities: ["gpu"]     # ← ОБЯЗАТЕЛЬНО
     command: >
