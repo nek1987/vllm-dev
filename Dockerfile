@@ -1,5 +1,5 @@
 # ── stage 1 ────────────────────────────────────────────────────────────────
-# ── stage 1 ─────────────────────────────────────────────
+
 FROM vllm/vllm-openai:latest AS builder
 
 RUN pip uninstall -y vllm \
