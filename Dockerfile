@@ -1,5 +1,5 @@
 # ── Dockerfile ────────────────────────────────────────────────────────────
-FROM vllm/vllm-openai:nightly-cuda12.4          # Python 3.11, vLLM master
+FROM vllm/vllm-openai:nightly-cuda12.4   
 
 # (по желанию) cli-утилиты
 RUN pip install --no-cache-dir fastapi uvicorn huggingface_hub[cli]
