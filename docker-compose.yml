@@ -10,7 +10,7 @@ services:
     command: >
       --model Qwen/Qwen3-8B
       --dtype float16
-      --enable-chunked-prefill False 
+      --enable-chunked-prefill
       --max-model-len 32768
       --port 5080
     environment:
