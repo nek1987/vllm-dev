@@ -11,7 +11,7 @@ services:
     command: >
       --model Qwen/Qwen3-8B
       --dtype float16
-      --enable-chunked-prefill False     # V100 workaround
+      --enable-chunked-prefill False 
       --max-model-len 32768
       --port 8000
     environment:
