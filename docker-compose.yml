@@ -12,6 +12,7 @@ services:
       --dtype float16
       --enable-chunked-prefill
       --max-model-len 32768
+      --disable-cuda-graph
       --port 5080
     environment:
       - HF_TOKEN=${HF_TOKEN}
