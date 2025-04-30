@@ -1,36 +1,33 @@
-############################
+########################
 # stage 1 – build layer
-############################
+########################
 FROM nvidia/cuda:12.4.1-runtime-ubuntu22.04 AS builder
 
-# 1. базовые утилиты для git-clone
-RUN apt-get update -qq && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-        git ca-certificates && \
-    rm -rf /var/lib/apt/lists/*
-
-# 2. Torch 2.6.dev* + Triton 3.0
+# 1) nightly Torch 2.6 + Triton 3      ← ничего из apt не тянем
 RUN pip install --no-cache-dir --pre torch \
-      --index-url https://download.pytorch.org/whl/nightly/cu124 && \
-    pip install --no-cache-dir triton==3.0.0
+      --index-url https://download.pytorch.org/whl/nightly/cu124 \
+ && pip install --no-cache-dir triton==3.0.0
 
-# 3. vLLM master (shallow-clone, без LFS)
-ENV GIT_LFS_SKIP_SMUDGE=1
-RUN pip install --no-cache-dir \
-      "vllm @ git+https://github.com/vllm-project/vllm.git@master"
+# 2) скачиваем master-ветку vLLM обычным .tar.gz
+ADD https://github.com/vllm-project/vllm/archive/refs/heads/master.tar.gz /tmp/vllm.tar.gz
+
+# 3) распаковываем и ставим **editable**; подсовываем версию вручную —
+#    так setuptools-scm не требует .git
+ENV SETUPTOOLS_SCM_PRETEND_VERSION=0.8.6.dev0
+RUN mkdir /tmp/vllm && \
+    tar -xzf /tmp/vllm.tar.gz --strip-components=1 -C /tmp/vllm && \
+    pip install --no-cache-dir -e /tmp/vllm
 
 ############################
 # stage 2 – runtime layer
 ############################
 FROM nvidia/cuda:12.4.1-runtime-ubuntu22.04
-
-# копируем Python-окружение из builder
 COPY --from=builder /usr/local /usr/local
 
-# (опционально) cli-утилиты
+# (необязательно) мелкие утилиты
 RUN pip install --no-cache-dir uvicorn fastapi huggingface_hub[cli]
 
-# заранее скачиваем модель
+# Кэшируем модель во время билда
 ARG HF_TOKEN
 RUN huggingface-cli download Qwen/Qwen3-8B \
       --token "$HF_TOKEN" \
